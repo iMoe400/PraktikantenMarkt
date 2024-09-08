@@ -1,0 +1,66 @@
+.nav-container {
+    background-color: #333;
+    padding: 10px 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar {
+    display: flex;
+    align-items: center; /* Vertikal ausgerichtet */
+    justify-content: flex-end;
+}
+
+.nav-list {
+    list-style-type: none; /* Keine Aufzählungszeichen */
+    display: flex; /* Listenelemente nebeneinander auflisten */
+    margin: 0;
+    padding: 0;
+}
+
+/* Stile für einzelne Links */
+.nav-list li {
+    margin: 0 15px; /* Abstand zwischen den Links */
+}
+
+.nav-list li a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover-Effekt für die Links */
+.nav-list li a:hover {
+    background-color: #575757;
+}
+
+/* Für ein responsives Layout, Mobile-Ansicht */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: row; /* Vertikale Ausrichtung für kleine Bildschirme */
+    }
+
+    .nav-list {
+        flex-direction: row;
+        justify-items: flex-end;
+    }
+
+    .nav-list li {
+        margin: 10px 0;
+    }
+}
+
+/* Generelle Eingabefelder mit leichter Umrandung */
+input[type="text"], input[type="password"], input[type="email"], input[type="date"], select, textarea {
+    border: 1px solid #e0e0e0; /* Sehr helle Umrandung */
+    transition: border-color 0.3s ease;
+}
+
+/* Fokus-Effekt für alle Eingabefelder */
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, input[type="date"]:focus, select:focus, textarea:focus {
+    border-color: #007bff; /* Blau hervorgehoben beim Fokussieren */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Weicher blauer Schatten */
+    outline: none; /* Entfernt die Standard-Umrandung */
+}

@@ -13,7 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 
@@ -32,89 +32,93 @@ public class RegisterController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @GetMapping("/register")
-    public String showRegistrationForm(Model model) {
-        return "register";
+    @GetMapping("/register/decision")
+    public String showDecisionForm() {
+
+        return "registerChoose";
     }
 
-    @PostMapping("/register/company")
-    public String registerCompany(@RequestParam("companyName") String companyName,
-                                  @RequestParam("username") String username,
-                                  @RequestParam("password") String password,
-                                  @RequestParam("email") String email,
-                                  @RequestParam("description") String description,
-                                  @RequestParam("lookingForIntern") String lookingForIntern,
+
+    @PostMapping("/register")
+    public String confirmRegisterForm(Model model,
+                                      @RequestParam(value = "companyName", required = false) String companyName,
+                                      @RequestParam(value = "usernamePrakti", required = false) String usernamePrakti,
+                                      @RequestParam(value = "passwordPrakti", required = false) String passwordPrakti,
+                                      @RequestParam(value = "emailPrakti", required = false) String emailPrakti,
+                                      @RequestParam(value = "usernameUnternehmi", required = false) String usernameUnternehmi,
+                                      @RequestParam(value = "passwordUnternehmi", required = false) String passwordUnternehmi,
+                                      @RequestParam(value = "emailUnternehmi", required = false) String emailUnternehmi,
+                                      @RequestParam(value = "descriptionUnternehmi", required = false) String description,
+                                      @RequestParam(value = "lookingForIntern", required = false) String lookingForIntern,
+                                      @RequestParam(value = "firstName", required = false) String firstName,
+                                      @RequestParam(value = "lastName", required = false) String lastName,
+                                      @RequestParam("birthday") LocalDate birthday,
+                                      @RequestParam(value = "lookingForCompany", required = false) String lookingForCompany,
+                                      @RequestParam(value = "decisionPrakti", required = false) boolean decisionPrakti,
+                                      @RequestParam(value = "decisionUnternehmi", required = false) boolean decisionUnternehmi,
+                               RedirectAttributes redirectAttributes) {
+
+
+        // Hier RedirectAttributes setzen
+        // error, wenn RollenSpezifische Daten fehlen, back to login!
+
+
+        if (userRepo.findByUsername(usernamePrakti) == null) {
+            if (decisionPrakti) {
+                String hashedPassword = passwordEncoder.encode(passwordPrakti);
+                User newUser = new User();
+                newUser.setUsername(usernamePrakti);
+                newUser.setPasswordHash(hashedPassword);
+                newUser.setRole("PRAKTIKANT");
+                newUser.setEmail(emailPrakti);
+                newUser.setIsActive(true);
+                userRepo.save(newUser);
+                Intern intern = new Intern();
+                intern.setFirstName(firstName);
+                intern.setLastName(lastName);
+                intern.setLookingForCompany(lookingForCompany.equals("JA"));
+                intern.setDateOfBirth(birthday);
+                intern.setUser(newUser);  // Korrekte Verknüpfung des Interns mit dem User
+                internRepo.save(intern);
+                redirectAttributes.addAttribute("username", usernamePrakti);
+                redirectAttributes.addAttribute("password", passwordPrakti);
+            } else if (decisionUnternehmi) {
+                Company company = new Company();
+                company.setCompanyName(companyName);
+                company.setDescription(description);
+                company.setLookingForIntern(lookingForIntern.equals("JA"));
+                company.setUser(userRepo.findByUsername(usernameUnternehmi));
+                companyRepo.save(company);
+                String hashedPassword = passwordEncoder.encode(passwordUnternehmi);
+                User newUser = new User();
+                newUser.setUsername(usernameUnternehmi);
+                newUser.setPasswordHash(hashedPassword);
+                newUser.setRole("UNTERNEHMEN");
+                newUser.setEmail(emailUnternehmi);
+                newUser.setIsActive(true);
+                userRepo.save(newUser);
+                redirectAttributes.addAttribute("username", usernameUnternehmi);
+                redirectAttributes.addAttribute("password", passwordUnternehmi);
+            }
+            model.addAttribute("error", true);
+            return "registerChoose";  // Bei Fehler wird die Registrierung erneut angezeigt
+        }
+        return "redirect:/login";
+    }
+
+    @PostMapping("/register/create")
+    public String showRegisterForm( @RequestParam(value = "decisionPrakti", required = false, defaultValue = "false") boolean decisionPrakti,
+                                    @RequestParam(value = "decisionUnternehmi", required = false, defaultValue = "false") boolean decisionUnternehmi,
+                                    RedirectAttributes redirectAttributes,
                                   Model model) {
 
-        // Prüfen, ob Benutzername bereits existiert
-        if (companyRepo.findByCompanyName(username) != null) {
-            model.addAttribute("error", true);
-            return "register";  // Bei Fehler wird die Registrierung erneut angezeigt
+        if(decisionPrakti) {
+            model.addAttribute("decisionPrakti", decisionPrakti);
+            redirectAttributes.addFlashAttribute("decisionPrakti", decisionPrakti);
+        } else {
+            model.addAttribute("decisionUnternehmi", decisionUnternehmi);
+            redirectAttributes.addFlashAttribute("decisionUnternehmi", decisionUnternehmi);
         }
-        // Passwort hashen und Benutzer speichern
-        String hashedPassword = passwordEncoder.encode(password);
-        User newUser = new User();
-        newUser.setUsername(username);
-        newUser.setPasswordHash(hashedPassword);
-        newUser.setRole("UNTERNEHMEN");
-        newUser.setEmail(email);
-        newUser.setIsActive(true);
-        userRepo.save(newUser);
-
-        Company company = new Company();
-        company.setCompanyName(companyName);
-        company.setDescription(description);
-        company.setLookingForIntern(lookingForIntern.equals("JA"));
-        company.setUser(userRepo.findByUsername(username));
-        companyRepo.save(company);
-
-
-        return "login";
-    }
-
-    @GetMapping("/register/company")
-    public ModelAndView showCompanyForm(Model model) {
-        return new ModelAndView("registerCompany");
-    }
-
-    @GetMapping("/register/intern")
-    public ModelAndView showInternForm(Model model) {
-        return new ModelAndView("registerIntern");
-    }
-
-    // Verarbeitet die Registrierung
-    @PostMapping("/register/intern")
-    public String registerIntern(@RequestParam("username") String username,
-                                 @RequestParam("password") String password,
-                                 @RequestParam("email") String email,
-                                 @RequestParam("firstName") String firstName,
-                                 @RequestParam("lastName") String lastName,
-                                 @RequestParam("birthday") LocalDate birthday,
-                                 @RequestParam("lookingForCompany") String lookingForCompany,
-                                 Model model) {
-        // Prüfen, ob Benutzername bereits existiert (Korrektur)
-        if (userRepo.findByUsername(username) != null) {
-            model.addAttribute("error", true);
-            return "register";  // Bei Fehler wird die Registrierung erneut angezeigt
-        }
-        // Passwort hashen und Benutzer speichern
-        String hashedPassword = passwordEncoder.encode(password);
-        User newUser = new User();
-        newUser.setUsername(username);
-        newUser.setPasswordHash(hashedPassword);
-        newUser.setRole("PRAKTIKANT");  // Korrekte Rolle setzen
-        newUser.setEmail(email);
-        newUser.setIsActive(true);
-        userRepo.save(newUser);
-
-        Intern intern = new Intern();
-        intern.setFirstName(firstName);
-        intern.setLastName(lastName);
-        intern.setLookingForCompany(lookingForCompany.equals("JA"));
-        intern.setDateOfBirth(birthday);
-        intern.setUser(newUser);  // Korrekte Verknüpfung des Interns mit dem User
-        internRepo.save(intern);
-
-        return "login";
+        return "registerCreate";
     }
 }

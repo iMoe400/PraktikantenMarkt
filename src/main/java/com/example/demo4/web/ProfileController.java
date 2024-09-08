@@ -33,11 +33,9 @@ public class ProfileController {
     @Autowired
     private CompanyRepo companyRepo;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/show")
-    public String showProfile(Model model, Authentication authentication, Principal principal, @ModelAttribute("error") String error, RedirectAttributes redirectAttributes) {
+    public String showProfile(Model model, Principal principal, @ModelAttribute("error") String error, RedirectAttributes redirectAttributes) {
 
 
         if(principal == null) {
@@ -78,8 +76,19 @@ public class ProfileController {
 
 
     @GetMapping("/edit")
-    public String editProfile(Model model, Principal principal) {
+    public String editProfile(Model model, Principal principal, RedirectAttributes redirectAttributes) {
+
+        if(principal == null) {
+            redirectAttributes.addFlashAttribute("error", "You are not logged in");
+            return "redirect:/login";
+        }
         User user = userRepo.findByUsername(principal.getName());
+
+
+
+
+
+
         model.addAttribute("user", user);
         if ("PRAKTIKANT".equals(user.getRole())) {
             Optional<Intern> intern = internRepo.findByUserId(user.getId());
@@ -172,11 +181,5 @@ public class ProfileController {
     }
 
 
-    public String getTemplateByRole(String role) {
-        return switch (role) {
-            case "PRAKTIKANT" -> "showIntern";
-            case "UNTERNEHMEN" -> "showCompany";
-            default -> "error";
-        };
-    }
+
 }
