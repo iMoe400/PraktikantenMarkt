@@ -1,0 +1,16 @@
+<div th:fragment="navbar" class="nav flex-content">
+    <nav>
+        <ul>
+            <li><a href="/home">Home</a></li>
+            <!-- Dynamischer Link basierend auf der Benutzerrolle -->
+            <li th:if="${#authorization.expression('hasRole(''PRAKTIKANT'')')}">
+                <a href="/praktikant">Praktikant Dashboard</a>
+            </li>
+            <li th:if="${#authorization.expression('hasRole(''UNTERNEHMEN'')')}">
+                <a href="/unternehmen">Unternehmen Dashboard</a>
+            </li>
+            <li><a href="/profile/show">Profile</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+</div>

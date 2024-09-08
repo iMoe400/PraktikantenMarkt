@@ -11,6 +11,7 @@ import lombok.Setter;
 public class Skill {
     @Id
     @Column(name = "SkillId", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "Name", nullable = false, length = 50)

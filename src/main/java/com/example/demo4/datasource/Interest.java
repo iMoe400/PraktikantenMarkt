@@ -10,8 +10,8 @@ import lombok.Setter;
 @Table(name = "interests", schema = "praktikantenmarkt")
 public class Interest {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "InterestId", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "Name", nullable = false, length = 50)

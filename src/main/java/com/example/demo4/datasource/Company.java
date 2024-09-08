@@ -11,12 +11,12 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(name = "companies", schema = "praktikantenmarkt")
 public class Company {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CompanyId", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UserId")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", referencedColumnName = "UserId")
     private User user;
 
     @Column(name = "CompanyName", nullable = false, length = 50)

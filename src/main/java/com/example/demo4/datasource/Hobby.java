@@ -11,11 +11,12 @@ import lombok.Setter;
 public class Hobby {
     @Id
     @Column(name = "HobbyId", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "InternId")
-    private Intern intern;
+    private com.example.demo4.datasource.Intern intern;
 
     @Column(name = "Name", nullable = false, length = 50)
     private String name;

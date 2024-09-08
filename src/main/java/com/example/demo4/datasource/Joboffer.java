@@ -14,6 +14,7 @@ import java.time.LocalDate;
 public class Joboffer {
     @Id
     @Column(name = "JobOfferId", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)

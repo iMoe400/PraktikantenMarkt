@@ -10,8 +10,8 @@ import lombok.Setter;
 @Table(name = "adress", schema = "praktikantenmarkt")
 public class Adress {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "AdressId", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "City", nullable = false, length = 50)
@@ -28,5 +28,9 @@ public class Adress {
 
     @Column(name = "HouseNumber", length = 25)
     private String houseNumber;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CountryId")
+    private com.example.demo4.datasource.Country country;
 
 }

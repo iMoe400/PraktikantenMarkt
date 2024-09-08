@@ -11,6 +11,7 @@ import lombok.Setter;
 public class Department {
     @Id
     @Column(name = "DepartmentId", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)

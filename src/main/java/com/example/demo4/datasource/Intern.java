@@ -13,16 +13,16 @@ import java.time.LocalDate;
 @Table(name = "interns", schema = "praktikantenmarkt")
 public class Intern {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "InternId", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UserID")
-    private User userID;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", referencedColumnName = "UserId")
+    private User user;
 
     @Column(name = "FirsName", nullable = false, length = 50)
-    private String firsName;
+    private String firstName;
 
     @Column(name = "LastName", nullable = false, length = 50)
     private String lastName;

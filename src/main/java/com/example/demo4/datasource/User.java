@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 
@@ -14,31 +16,38 @@ import java.time.Instant;
 public class User {
     @Id
     @Column(name = "UserId", nullable = false)
-    private Integer UserId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @Column(name = "Username", nullable = false, length = 50)
-    private String Username;
+    private String username;
 
     @Column(name = "PasswordHash", nullable = false)
-    private String PasswordHash;
+    private String passwordHash;
 
     @Column(name = "Email", nullable = false, length = 100)
-    private String Email;
+    private String email;
 
     @Lob
     @Column(name = "Role", nullable = false)
-    private String Role;
+    private String role;
 
-    @ColumnDefault("current_timestamp()")
-    @Column(name = "CreatedAt", nullable = false)
-    private Instant CreatedAt;
+    // @CreationTimestamp setzt den Wert automatisch beim ersten Speichern des Datensatzes
+    @CreationTimestamp
+    @Column(name = "CreatedAt", nullable = false, updatable = false)
+    private Instant createdAt;
 
-    @ColumnDefault("current_timestamp()")
+    // @UpdateTimestamp setzt den Wert automatisch bei jeder Aktualisierung des Datensatzes
+    @UpdateTimestamp
     @Column(name = "UpdatedAt", nullable = false)
-    private Instant UpdatedAt;
+    private Instant updatedAt;
 
+    // Standardwert für IsActive setzen
     @ColumnDefault("1")
-    @Column(name = "IsActive")
-    private Boolean IsActive;
+    @Column(name = "IsActive", nullable = false)
+    private Boolean isActive = true;
 
+    public boolean isActive() {
+        return isActive;
+    }
 }
