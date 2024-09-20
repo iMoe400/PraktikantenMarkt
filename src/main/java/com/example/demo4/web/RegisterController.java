@@ -6,6 +6,7 @@ import com.example.demo4.datasource.User;
 import com.example.demo4.repositories.CompanyRepo;
 import com.example.demo4.repositories.InternRepo;
 import com.example.demo4.repositories.UserRepo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 
+@Slf4j
 @Controller
 public class RegisterController {
 
@@ -40,29 +42,11 @@ public class RegisterController {
 
 
     @PostMapping("/register")
-    public String confirmRegisterForm(Model model,
-                                      @RequestParam(value = "companyName", required = false) String companyName,
-                                      @RequestParam(value = "usernamePrakti", required = false) String usernamePrakti,
-                                      @RequestParam(value = "passwordPrakti", required = false) String passwordPrakti,
-                                      @RequestParam(value = "emailPrakti", required = false) String emailPrakti,
-                                      @RequestParam(value = "usernameUnternehmi", required = false) String usernameUnternehmi,
-                                      @RequestParam(value = "passwordUnternehmi", required = false) String passwordUnternehmi,
-                                      @RequestParam(value = "emailUnternehmi", required = false) String emailUnternehmi,
-                                      @RequestParam(value = "descriptionUnternehmi", required = false) String description,
-                                      @RequestParam(value = "lookingForIntern", required = false) String lookingForIntern,
-                                      @RequestParam(value = "firstName", required = false) String firstName,
-                                      @RequestParam(value = "lastName", required = false) String lastName,
-                                      @RequestParam("birthday") LocalDate birthday,
-                                      @RequestParam(value = "lookingForCompany", required = false) String lookingForCompany,
-                                      @RequestParam(value = "decisionPrakti", required = false) boolean decisionPrakti,
-                                      @RequestParam(value = "decisionUnternehmi", required = false) boolean decisionUnternehmi,
-                               RedirectAttributes redirectAttributes) {
+    public String confirmRegisterForm(Model model, @RequestParam(value = "companyName", required = false) String companyName, @RequestParam(value = "usernamePrakti", required = false) String usernamePrakti, @RequestParam(value = "passwordPrakti", required = false) String passwordPrakti, @RequestParam(value = "emailPrakti", required = false) String emailPrakti, @RequestParam(value = "usernameUnternehmi", required = false) String usernameUnternehmi, @RequestParam(value = "passwordUnternehmi", required = false) String passwordUnternehmi, @RequestParam(value = "emailUnternehmi", required = false) String emailUnternehmi, @RequestParam(value = "descriptionUnternehmi", required = false) String description, @RequestParam(value = "lookingForIntern", required = false) String lookingForIntern, @RequestParam(value = "firstName", required = false) String firstName, @RequestParam(value = "lastName", required = false) String lastName, @RequestParam("birthday") LocalDate birthday, @RequestParam(value = "lookingForCompany", required = false) String lookingForCompany, @RequestParam(value = "decisionPrakti") Boolean decisionPrakti, @RequestParam(value = "decisionUnternehmi") Boolean decisionUnternehmi, RedirectAttributes redirectAttributes) {
 
 
         // Hier RedirectAttributes setzen
         // error, wenn RollenSpezifische Daten fehlen, back to login!
-
-
         if (userRepo.findByUsername(usernamePrakti) == null) {
             if (decisionPrakti) {
                 String hashedPassword = passwordEncoder.encode(passwordPrakti);
@@ -101,23 +85,24 @@ public class RegisterController {
                 redirectAttributes.addAttribute("password", passwordUnternehmi);
             }
             model.addAttribute("error", true);
-            return "registerChoose";  // Bei Fehler wird die Registrierung erneut angezeigt
         }
         return "redirect:/login";
     }
 
     @PostMapping("/register/create")
-    public String showRegisterForm( @RequestParam(value = "decisionPrakti", required = false, defaultValue = "false") boolean decisionPrakti,
-                                    @RequestParam(value = "decisionUnternehmi", required = false, defaultValue = "false") boolean decisionUnternehmi,
-                                    RedirectAttributes redirectAttributes,
-                                  Model model) {
+    public String showRegisterForm(@RequestParam(value = "decisionPrakti", required = false, defaultValue = "false") Boolean decisionPrakti, @RequestParam(value = "decisionUnternehmi", required = false, defaultValue = "false") Boolean decisionUnternehmi, RedirectAttributes redirectAttributes, Model model) {
 
-        if(decisionPrakti) {
+
+        if (decisionPrakti) {
             model.addAttribute("decisionPrakti", decisionPrakti);
             redirectAttributes.addFlashAttribute("decisionPrakti", decisionPrakti);
-        } else {
+        } else if (decisionUnternehmi) {
             model.addAttribute("decisionUnternehmi", decisionUnternehmi);
             redirectAttributes.addFlashAttribute("decisionUnternehmi", decisionUnternehmi);
+        } else {
+            log.warn("REGISTER CONTROLLER: no decision detected");
+            model.addAttribute("error", true);
+            return "registerChoose";
         }
         return "registerCreate";
     }

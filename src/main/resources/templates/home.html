@@ -28,8 +28,10 @@
             <div class="card">
                 <div class="card-body text-center">
                     <img src="https://via.placeholder.com/150" class="img-fluid rounded-circle mb-3" alt="Profilbild">
-                    <h5 class="card-title">Dein Name</h5>
-                    <p class="card-text">Kurze Beschreibung oder Slogan</p>
+                    <h5 class="card-title" th:text="${info.getFirstName()}"></h5>
+                    <p class="card-text" th:text="${info.getLastName()}"></p>
+                    <p class="card-text" th:text="${info.getProfileDescription()}"></p>
+
                 </div>
             </div>
         </div>
@@ -41,9 +43,9 @@
                     <h5 class="card-title">Profilinformationen</h5>
                     <p class="card-text">Hier kannst du detaillierte Profilinformationen anzeigen oder bearbeiten.</p>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item"><strong>E-Mail:</strong> deine.email@beispiel.de</li>
-                        <li class="list-group-item"><strong>Telefon:</strong> +49 123 456789</li>
-                        <li class="list-group-item"><strong>Adresse:</strong> Deine Adresse</li>
+                        <li class="list-group-item" th:text="${user.getEmail()}"><strong>E-Mail:</strong></li>
+                        <li class="list-group-item" th:text="${user.getCreatedAt()}"><strong>Erstellt am:</strong></li>
+                        <li class="list-group-item" th:text="${user.getIsActive()}"><strong>Ist Aktiv:</strong></li>
                     </ul>
                 </div>
             </div>
